@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RM Account Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;--sf:#fff;--sf2:#f0f2f9;--bd:#e2e5f0;
+  --tx:#1a1d2e;--mt:#6b7194;
+  --gn:#059669;--gd:#ecfdf5;--gb:#a7f3d0;
+  --rd:#dc2626;--rdd:#fef2f2;--rb:#fecaca;
+  --am:#d97706;--amd:#fffbeb;--amb:#fde68a;
+  --bl:#2563eb;--bld:#eff6ff;--blb:#bfdbfe;
+  --r:10px;--rl:14px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:14px;line-height:1.5}
+.app{max-width:1020px;margin:0 auto;padding:1.5rem 1.25rem}
+.hdr{background:var(--sf);border-radius:var(--rl);padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:var(--sh);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hdr-t{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.hdr-s{font-size:11px;color:var(--mt);margin-top:1px}
+.fy-tag{background:var(--bld);color:var(--bl);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--blb)}
+.urow{display:flex;gap:3px;background:var(--sf2);border-radius:8px;padding:3px;border:1px solid var(--bd)}
+.ubtn{padding:4px 10px;border-radius:6px;border:none;background:transparent;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;cursor:pointer;color:var(--mt);transition:.15s}
+.ubtn.on{background:var(--sf);color:var(--bl);font-weight:600;box-shadow:var(--sh)}
+.steps{background:var(--sf);border-radius:var(--rl);padding:5px;margin-bottom:1rem;box-shadow:var(--sh);display:flex;gap:3px;overflow-x:auto}
+.stp{padding:7px 13px;border-radius:8px;border:none;background:transparent;color:var(--mt);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:.15s;flex-shrink:0}
+.stp:hover{background:var(--sf2);color:var(--tx)}.stp.on{background:var(--bl);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:1.25rem;margin-bottom:.875rem;box-shadow:var(--sh)}
+.ct{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mt);margin-bottom:10px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.g5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.metric{background:var(--sf2);border-radius:var(--r);padding:12px 14px;border:1px solid var(--bd)}
+.ml{font-size:10px;color:var(--mt);margin-bottom:3px;font-weight:500}
+.mv{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ms{font-size:10px;color:var(--mt);margin-top:2px}
+input,select{background:var(--sf);border:1.5px solid var(--bd);border-radius:8px;color:var(--tx);font-family:'Inter',sans-serif;font-size:13px;padding:7px 10px;width:100%;outline:none;transition:.15s}
+input:focus,select:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+select option{background:var(--sf)}
+label{font-size:11px;color:var(--mt);display:block;margin-bottom:4px;font-weight:500}
+.field{margin-bottom:10px}
+.btn{background:var(--bl);color:#fff;border:none;border-radius:var(--r);padding:9px 20px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;display:inline-block}
+.btn:hover{background:#1d4ed8}
+.btn-out{background:var(--sf);border:1.5px solid var(--bd);color:var(--mt);border-radius:8px;padding:7px 14px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:.15s}
+.btn-out:hover{border-color:var(--bl);color:var(--bl)}
+.btn-gn{background:var(--gn);color:#fff;border:none;border-radius:var(--r);padding:9px 20px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+.btn-gn:hover{opacity:.88}
+.brow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.upz{border:2px dashed var(--bd);border-radius:var(--rl);padding:2rem;text-align:center;cursor:pointer;background:var(--sf2);transition:.2s}
+.upz:hover{border-color:var(--bl);background:var(--bld)}.upz.ok{border-color:var(--gn);background:var(--gd)}
+.twrap{overflow-x:auto;margin-bottom:8px}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;color:var(--mt);font-weight:600;text-align:left;padding:7px 8px;border-bottom:2px solid var(--bd);white-space:nowrap;background:var(--sf2)}
+td{padding:6px 8px;vertical-align:middle;border-bottom:1px solid var(--bd);font-size:12px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--sf2)}
+tr.total-row td{background:var(--sf2);font-weight:600;border-top:2px solid var(--bd);border-bottom:none}
+td input[type=number]{width:85px;padding:4px 6px;font-size:12px;border-radius:6px;border-width:1px;font-family:'JetBrains Mono',monospace}
+td select{padding:4px 5px;font-size:11px;border-radius:6px;width:58px;border-width:1px}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+.bg{background:var(--gd);color:var(--gn);border:1px solid var(--gb)}
+.bp{background:var(--rdd);color:var(--rd);border:1px solid var(--rb)}
+.bh{background:var(--amd);color:var(--am);border:1px solid var(--amb)}
+.be{background:var(--bld);color:var(--bl);border:1px solid var(--blb)}
+.bu{background:var(--sf2);color:var(--mt);border:1px solid var(--bd)}
+.mgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:5px}
+.mc{background:var(--sf);border-radius:8px;padding:8px 5px;border:1.5px solid var(--bd);text-align:center}
+.mc.past{opacity:.4;background:var(--sf2)}.mc.cur{border-color:var(--bl);background:var(--bld)}
+.mc.q1{border-top:3px solid var(--bl)}.mc.q2{border-top:3px solid var(--gn)}
+.mc.q3{border-top:3px solid var(--am)}.mc.q4{border-top:3px solid var(--rd)}
+.mn{font-size:9px;color:var(--mt);margin-bottom:2px;font-weight:600}
+.mv2{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.mq{font-size:9px;color:var(--mt);margin-top:1px}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.rr:last-child{border-bottom:none}
+.warn{background:var(--amd);border:1px solid var(--amb);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--am);margin-bottom:8px;font-weight:500}
+.danger{background:var(--rdd);border:1px solid var(--rb);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--rd);margin-bottom:8px;font-weight:500}
+.exec{background:linear-gradient(135deg,#1e1b4b,#312e81);border-radius:var(--rl);padding:1.25rem;margin-bottom:.875rem;color:#fff}
+.et{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
+.eg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.em{background:rgba(255,255,255,.08);border-radius:8px;padding:10px 12px}
+.eml{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:3px}
+.emv{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.sig-table{width:100%;border-collapse:collapse;font-size:12px}
+.sig-table th{font-size:10px;color:rgba(255,255,255,.5);font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.12);background:transparent;white-space:nowrap}
+.sig-table td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.85);vertical-align:middle}
+.sig-table tr:last-child td{border-bottom:none}
+.sig-table tr:hover td{background:rgba(255,255,255,.05)}
+.sicon{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.ins{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--bd);box-shadow:var(--sh)}
+.ins.ig{border-left-color:var(--gn)}.ins.ip{border-left-color:var(--rd)}
+.ins.ie{border-left-color:var(--bl)}.ins.ih{border-left-color:var(--am)}
+.ins-hdr{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.erow{display:grid;grid-template-columns:140px 75px 85px 1fr;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd)}
+.erow:last-child{border-bottom:none}
+.ehead{display:grid;grid-template-columns:140px 75px 85px 1fr;gap:8px;margin-bottom:4px}
+.ehead span{font-size:10px;color:var(--mt);font-weight:600}
+.simrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slbl{font-size:12px;color:var(--mt);width:200px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.spct{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:600;width:46px;text-align:right;flex-shrink:0}
+input[type=range]{accent-color:var(--bl);cursor:pointer;flex:1}
+.tip{font-size:11px;color:var(--mt);margin-top:6px;line-height:1.5}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:500}
+.sep{height:1px;background:var(--bd);margin:12px 0}
+.frow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.fsel{width:auto;max-width:210px;font-size:12px;padding:5px 8px}
+.smcard{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;text-align:center}
+.smcard-l{font-size:10px;color:var(--mt);margin-bottom:1px}
+.smcard-v{font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="hdr">
+  <div>
+    <div class="hdr-t">RM Account Intelligence</div>
+    <div class="hdr-s">Indian Financial Year (Apr–Mar) &middot; CAGR-based targets &middot; Seasonality-driven monthly plans</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="urow">
+      <button class="ubtn on" onclick="setUnit('L')">Lakhs</button>
+      <button class="ubtn" onclick="setUnit('K')">Thousands</button>
+      <button class="ubtn" onclick="setUnit('Cr')">Crores</button>
+      <button class="ubtn" onclick="setUnit('N')">Numbers</button>
+    </div>
+    <span class="fy-tag">FY27 Forecast &middot; Apr 26–Mar 27</span>
+  </div>
+</div>
+
+<div class="steps">
+  <button class="stp on" id="s-upload"   onclick="goTo('upload')">1. Upload</button>
+  <button class="stp"    id="s-enrich"   onclick="goTo('enrich')">2. Account details</button>
+  <button class="stp"    id="s-targets"  onclick="gotoTargets()">3. Set targets</button>
+  <button class="stp"    id="s-priority" onclick="goTo('priority')">4. Priorities</button>
+  <button class="stp"    id="s-monthly"  onclick="goTo('monthly')">5. Monthly plan</button>
+  <button class="stp"    id="s-sim"      onclick="goTo('sim')">6. Simulator</button>
+  <button class="stp"    id="s-insights" onclick="goTo('insights')">7. Insights</button>
+</div>
+
+<!-- 1. UPLOAD -->
+<div class="panel on" id="p-upload">
+  <div class="card">
+    <div class="ct">Upload accounts CSV</div>
+    <div class="upz" id="upz" onclick="document.getElementById('fi').click()" ondragover="event.preventDefault()" ondrop="onDrop(event)">
+      <div style="font-size:32px;opacity:.3;margin-bottom:8px">&#128193;</div>
+      <div style="font-size:15px;font-weight:600;color:var(--tx);margin-bottom:4px" id="upz-title">Drop CSV or click to browse</div>
+      <div style="font-size:12px;color:var(--mt)">FY24 + FY25 + FY26 data &middot; Forecasts FY27 (Apr 26–Mar 27)</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button onclick="event.stopPropagation();dlTpl('M')" class="btn-out" style="font-size:11px">Monthly template</button>
+        <button onclick="event.stopPropagation();dlTpl('Q')" class="btn-out" style="font-size:11px">Quarterly template</button>
+      </div>
+    </div>
+    <input type="file" id="fi" accept=".csv" style="display:none" onchange="onFile(this)">
+    <div style="margin-top:12px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r)">
+      <div style="font-size:11px;font-weight:600;color:var(--mt);margin-bottom:6px">What unit are the numbers in your CSV?</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;width:auto;margin:0"><input type="radio" name="cu" value="L" checked id="cu-L" style="width:auto"> Lakhs (e.g. 8.5 = &#8377;8.5L)</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;width:auto;margin:0"><input type="radio" name="cu" value="K" id="cu-K" style="width:auto"> Thousands (e.g. 850 = &#8377;85K)</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;width:auto;margin:0"><input type="radio" name="cu" value="Cr" id="cu-Cr" style="width:auto"> Crores (e.g. 0.085 = &#8377;0.085Cr)</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;width:auto;margin:0"><input type="radio" name="cu" value="N" id="cu-N" style="width:auto"> Numbers (e.g. 36000 = raw rupees)</label>
+      </div>
+    </div>
+    <p class="tip">Numbers unit: 36,000 raw rupees = 0.36 Lakhs. Monthly template: 36 monthly columns Apr-23 to Mar-26. Select unit before uploading.</p>
+  </div>
+  <div class="card" id="prev-card" style="display:none">
+    <div class="frow">
+      <div class="ct" style="margin-bottom:0">Preview — <span id="prev-count"></span> accounts</div>
+      <select class="fsel" id="prev-filter" onchange="drawPreview()">
+        <option value="">All accounts</option>
+      </select>
+    </div>
+    <div class="twrap"><table id="prev-tbl"></table></div>
+  </div>
+  <div class="brow" id="upload-next" style="display:none">
+    <button class="btn" onclick="goTo('enrich')">Next: account details &rarr;</button>
+  </div>
+</div>
+
+<!-- 2. ENRICH -->
+<div class="panel" id="p-enrich">
+  <div class="card">
+    <div class="ct">Account details</div>
+    <p style="font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:10px">Relationship, Competitor risk and Products are <strong>optional</strong>. Leave as &mdash; to skip — the tool classifies accounts using CAGR data alone.</p>
+    <div id="port-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r)"></div>
+    <div class="frow">
+      <div class="ehead" style="margin-bottom:0;flex:1">
+        <span>Account</span><span>3yr CAGR</span><span>FY26 revenue</span>
+        <span>Optional — Relationship &nbsp; Competitor risk &nbsp; Products used (1–5)</span>
+      </div>
+      <select class="fsel" id="enrich-filter" onchange="drawEnrichRows()" style="margin-left:10px;width:160px">
+        <option value="">All accounts</option>
+      </select>
+    </div>
+    <div id="enrich-rows" style="margin-top:8px"></div>
+  </div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('upload')">&larr; Back</button>
+    <button class="btn" onclick="gotoTargets()">Next: set targets &rarr;</button>
+  </div>
+</div>
+
+<!-- 3. TARGETS -->
+<div class="panel" id="p-targets">
+  <div class="card">
+    <div class="field" style="max-width:300px">
+      <label>Industry / sector (optional)</label>
+      <input type="text" id="industry" placeholder="e.g. Banking, Insurance, SaaS">
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">FY27 target setting — Apr 2026 to Mar 2027</div>
+    <div class="g2" style="margin-bottom:14px">
+      <div style="background:var(--gd);border:1px solid var(--gb);border-radius:var(--r);padding:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--gn);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px">Natural CAGR projection</div>
+        <div style="font-size:11px;color:var(--mt);margin-bottom:8px;line-height:1.5">Each account continues its 3-year momentum. No extra effort assumed.</div>
+        <div style="font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--gn)" id="nat-total">—</div>
+        <div style="font-size:12px;font-weight:600;color:var(--gn);margin-top:3px" id="nat-cagr-lbl"></div>
+        <div style="font-size:10px;color:var(--mt);margin-top:1px">FY27 natural projection</div>
+      </div>
+      <div style="background:var(--amd);border:1px solid var(--amb);border-radius:var(--r);padding:14px">
+        <div style="font-size:10px;font-weight:700;color:var(--am);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px">Desired CAGR adjustment</div>
+        <div style="font-size:11px;color:var(--mt);margin-bottom:6px;line-height:1.5">
+          Extra % multiplied on natural CAGR.<br>
+          <strong>Formula:</strong> Desired CAGR = Natural CAGR × (1 + Extra%/100)<br>
+          e.g. CAGR 20% + 20% extra = 20% × 1.2 = 24% → target = FY26 × 1.24
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <input type="number" id="des-pct" value="20" min="0" max="300" style="width:75px" oninput="onDesPctChange()">
+          <span style="font-size:12px;color:var(--mt)">% adjustment on CAGR</span>
+        </div>
+        <div style="font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--am)" id="des-total">—</div>
+        <div style="font-size:12px;font-weight:600;color:var(--am);margin-top:3px" id="des-cagr-lbl"></div>
+        <div style="font-size:10px;color:var(--mt);margin-top:1px">FY27 desired target</div>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="frow">
+      <div class="ct" style="margin-bottom:0">Per-account breakdown — edit Desired FY27 to override</div>
+      <select class="fsel" id="tgt-filter" onchange="drawTgtTable()">
+        <option value="">All accounts</option>
+      </select>
+    </div>
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Account</th><th>FY26 actual</th><th>Natural CAGR</th>
+          <th>Natural FY27</th><th>Desired CAGR</th><th>Desired FY27 (editable)</th><th>Gap</th>
+        </tr></thead>
+        <tbody id="tgt-body"></tbody>
+      </table>
+    </div>
+    <p class="tip">Desired CAGR = Natural CAGR × (1 + adjustment%/100). Edit any Desired FY27 cell to override for that account.</p>
+  </div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('enrich')">&larr; Back</button>
+    <button class="btn-gn" onclick="runAnalysis()">Generate full analysis &rarr;</button>
+  </div>
+</div>
+
+<!-- 4. PRIORITIES -->
+<div class="panel" id="p-priority">
+  <div class="g4" id="pri-kpis" style="margin-bottom:.875rem"></div>
+  <div id="pri-warns"></div>
+  <div class="card">
+    <div class="frow">
+      <div class="ct" style="margin-bottom:0">Account priorities</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <select class="fsel" id="pri-filter-acc" onchange="drawPriorities()">
+          <option value="">All accounts</option>
+        </select>
+        <select class="fsel" id="pri-filter-cls" onchange="drawPriorities()">
+          <option value="">All strategies</option>
+          <option value="grow">Push hard</option>
+          <option value="explore">Explore</option>
+          <option value="protect">Protect</option>
+          <option value="hold">Maintain</option>
+        </select>
+      </div>
+    </div>
+    <div id="pri-list"></div>
+  </div>
+  <div class="card"><div class="ct">Revenue breakdown — Natural vs Desired FY27</div><div id="pri-bars"></div></div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('targets')">&larr; Back</button>
+    <button class="btn" onclick="goTo('monthly')">Monthly plan &rarr;</button>
+  </div>
+</div>
+
+<!-- 5. MONTHLY -->
+<div class="panel" id="p-monthly">
+  <div class="card">
+    <div class="ct">FY27 monthly targets — seasonality from FY24–FY26 actuals</div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="field">
+        <label>Current month in FY27 (1=Apr 26 … 12=Mar 27)</label>
+        <input type="number" id="cur-m" value="1" min="1" max="12" oninput="drawMonthly()">
+      </div>
+      <div class="field">
+        <label>FY27 revenue achieved so far (in your selected unit)</label>
+        <input type="number" id="fy-ach" value="0" min="0" oninput="drawMonthly()">
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;font-weight:500;margin-bottom:10px">
+      <span><span style="display:inline-block;width:12px;height:3px;background:var(--bl);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Q1 Apr-Jun</span>
+      <span><span style="display:inline-block;width:12px;height:3px;background:var(--gn);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Q2 Jul-Sep</span>
+      <span><span style="display:inline-block;width:12px;height:3px;background:var(--am);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Q3 Oct-Dec</span>
+      <span><span style="display:inline-block;width:12px;height:3px;background:var(--rd);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Q4 Jan-Mar</span>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--mt);margin-bottom:5px">Natural CAGR targets per month</div>
+    <div class="mgrid" id="mg-nat" style="margin-bottom:12px"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--mt);margin-bottom:5px">Desired targets per month</div>
+    <div class="mgrid" id="mg-des" style="margin-bottom:14px"></div>
+    <div class="sep"></div>
+    <div style="font-size:11px;font-weight:600;color:var(--mt);margin-bottom:8px">Monthly breakdown by account</div>
+    <select id="acc-sel" onchange="drawAccMonthly()" style="max-width:280px;margin-bottom:10px">
+      <option value="">— Select an account —</option>
+    </select>
+    <div id="mg-acc"></div>
+  </div>
+  <div class="card"><div class="ct">Recovery / acceleration plan</div><div id="recovery"></div></div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('priority')">&larr; Back</button>
+    <button class="btn" onclick="goTo('sim')">Simulator &rarr;</button>
+  </div>
+</div>
+
+<!-- 6. SIMULATOR -->
+<div class="panel" id="p-sim">
+  <div class="card">
+    <div class="ct">Growth simulator</div>
+    <p style="font-size:12px;color:var(--mt);margin-bottom:6px">Slider shows growth % <strong>above FY26 revenue</strong>. Natural CAGR is shown for reference. Desired target uses the adjusted CAGR method.</p>
+    <div id="sim-ctrls"></div>
+  </div>
+  <div class="g4" id="sim-kpis" style="margin-bottom:.875rem"></div>
+  <div class="card"><div class="ct">Simulated vs targets</div><div id="sim-bars"></div></div>
+  <div id="sim-warns"></div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('monthly')">&larr; Back</button>
+    <button class="btn" onclick="goTo('insights')">Insights &rarr;</button>
+  </div>
+</div>
+
+<!-- 7. INSIGHTS -->
+<div class="panel" id="p-insights">
+  <div class="exec" id="exec-box"></div>
+  <div class="card">
+    <div class="frow">
+      <div class="ct" style="margin-bottom:0">Account-level signals</div>
+      <select class="fsel" id="ins-filter" onchange="drawInsights()">
+        <option value="">All accounts</option>
+      </select>
+    </div>
+    <div id="acc-ins"></div>
+  </div>
+  <div class="brow">
+    <button class="btn-out" onclick="goTo('sim')">&larr; Back</button>
+    <button class="btn" onclick="goTo('upload')">Start over</button>
+  </div>
+</div>
+
+</div>
+<script>
+// ═══ CONSTANTS ═══════════════════════════════════════════
+var FYM  = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+var FYQ  = [0,0,0,1,1,1,2,2,2,3,3,3];
+var QCLS = ['q1','q2','q3','q4'];
+var STEPS= ['upload','enrich','targets','priority','monthly','sim','insights'];
+var STRAT= {
+  grow:   {lbl:'Push hard',bc:'bg',lc:'ig',col:'#059669'},
+  explore:{lbl:'Explore',  bc:'be',lc:'ie',col:'#2563eb'},
+  protect:{lbl:'Protect',  bc:'bp',lc:'ip',col:'#dc2626'},
+  hold:   {lbl:'Maintain', bc:'bh',lc:'ih',col:'#d97706'},
+  unknown:{lbl:'Review',   bc:'bu',lc:'',  col:'#6b7194'}
+};
+
+// ═══ STATE ═══════════════════════════════════════════════
+var accs = [];
+var enr  = [];
+var comp = [];
+var dispUnit = 'L';
+var csvUnit  = 'L';
+
+// ═══ UNIT FORMATTING ════════════════════════════════════
+// All values stored internally in Lakhs
+function setUnit(u) {
+  dispUnit = u;
+  document.querySelectorAll('.ubtn').forEach(function(b,i){
+    b.classList.toggle('on',['L','K','Cr','N'][i]===u);
+  });
+  if(accs.length){ drawPreview(); drawEnrichRows(); }
+  if(comp.length){ calcTargets(); drawTgtTable(); drawPriorities(); drawMonthly(); drawSim(); drawInsights(); }
+}
+
+function fmt(v) {
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  if(dispUnit==='K')  return (Math.round(v*100)/10).toLocaleString('en-IN')+'K';
+  if(dispUnit==='Cr') return (Math.round(v/100*10000)/10000).toFixed(4).replace(/\.?0+$/,'')+'Cr';
+  if(dispUnit==='N')  return Math.round(v*100000).toLocaleString('en-IN');
+  return (Math.round(v*10)/10).toLocaleString('en-IN')+'L';
+}
+function fmtS(v) {
+  if(v===null||v===undefined||isNaN(v)) return '—';
+  if(dispUnit==='K')  return Math.round(v*10).toLocaleString('en-IN')+'K';
+  if(dispUnit==='Cr') return (Math.round(v/100*100)/100).toFixed(2)+'Cr';
+  if(dispUnit==='N')  return Math.round(v*100000).toLocaleString('en-IN');
+  return (Math.round(v*10)/10).toFixed(1)+'L';
+}
+// Convert user display-unit value to Lakhs
+function toL(v) {
+  if(dispUnit==='K')  return v/10;
+  if(dispUnit==='Cr') return v*100;
+  if(dispUnit==='N')  return v/100000;
+  return v;
+}
+// Convert CSV raw value to Lakhs based on selected CSV unit
+function csvToL(v) {
+  if(csvUnit==='K')  return v/10;
+  if(csvUnit==='Cr') return v*100;
+  if(csvUnit==='N')  return v/100000;
+  return v; // already Lakhs
+}
+
+// ═══ NAVIGATION ══════════════════════════════════════════
+function goTo(name) {
+  STEPS.forEach(function(n){
+    var s=document.getElementById('s-'+n);
+    var p=document.getElementById('p-'+n);
+    if(s) s.classList.toggle('on',n===name);
+    if(p) p.classList.toggle('on',n===name);
+  });
+  window.scrollTo(0,0);
+}
+function gotoTargets() {
+  if(!accs.length){ alert('Please upload your accounts data first.'); return; }
+  syncEnr();
+  buildComp();
+  calcTargets();
+  drawTgtTable();
+  goTo('targets');
+}
+
+// ═══ TEMPLATE DOWNLOAD ══════════════════════════════════
+function dlTpl(type) {
+  var mL=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+  var fys=[[23,24],[24,25],[25,26]];
+  var seas=[72,74,78,82,84,88,92,90,96,88,84,82];
+  var smp=[['Client Alpha',8,.15],['Client Beta',5,.08],['Client Gamma',12,.22],['Client Delta',3,.05],['Client Epsilon',6,.18]];
+  if(type==='M'){
+    var cols=['Account'];
+    fys.forEach(function(fy){ mL.forEach(function(m,i){ cols.push(m+'-'+(i<9?fy[0]:fy[1])); }); });
+    var rows=[cols.join(',')];
+    smp.forEach(function(s){
+      var v=[s[0]];
+      for(var y=0;y<3;y++) seas.forEach(function(w){ v.push(Math.round(s[1]*(1+s[2]*y)*w/82)); });
+      rows.push(v.join(','));
+    });
+    trigDl(rows.join('\n'),'rm-monthly-template.csv');
+  } else {
+    var qL=['Q1-Apr-Jun','Q2-Jul-Sep','Q3-Oct-Dec','Q4-Jan-Mar'];
+    var qS=[23,26,29,22];
+    var hdr=['Account'];
+    fys.forEach(function(fy){ qL.forEach(function(q){ hdr.push('FY'+(fy[0]+1)+'-'+q); }); });
+    var rows2=[hdr.join(',')];
+    smp.forEach(function(s){
+      var v=[s[0]];
+      for(var y=0;y<3;y++) qS.forEach(function(w){ v.push(Math.round(s[1]*(1+s[2]*y)*w/100*12)); });
+      rows2.push(v.join(','));
+    });
+    trigDl(rows2.join('\n'),'rm-quarterly-template.csv');
+  }
+}
+function trigDl(c,f){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'})); a.download=f; a.click(); }
+
+// ═══ CSV UPLOAD ══════════════════════════════════════════
+function onDrop(e){ e.preventDefault(); if(e.dataTransfer.files[0]) parseCSV(e.dataTransfer.files[0]); }
+function onFile(inp){ if(inp.files[0]) parseCSV(inp.files[0]); }
+
+function parseCSV(file){
+  var el=document.querySelector('input[name="cu"]:checked');
+  csvUnit=el?el.value:'L';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var lines=e.target.result.trim().split('\n').filter(function(l){return l.trim();});
+      if(lines.length<2){ alert('Need at least a header and one data row.'); return; }
+      var hdrs=lines[0].split(',').map(function(h){return h.trim();});
+      var dataCols=hdrs.length-1;
+      accs=[];
+      for(var i=1;i<lines.length;i++){
+        var cells=lines[i].split(',').map(function(c){return c.trim();});
+        if(!cells[0]) continue;
+        var m36=[];
+        if(dataCols<=12){
+          // Quarterly — expand each quarter to 3 equal months
+          for(var j=1;j<=12;j++){
+            var qv=csvToL(parseFloat(cells[j])||0);
+            m36.push(qv/3); m36.push(qv/3); m36.push(qv/3);
+          }
+        } else {
+          for(var j=1;j<=36;j++) m36.push(csvToL(parseFloat(cells[j])||0));
+        }
+        while(m36.length<36) m36.push(0);
+        accs.push({name:cells[0],m36:m36});
+      }
+      enr=accs.map(function(a){return{name:a.name,rel:null,comp:null,prod:null};});
+      // Populate dropdowns
+      popAccDropdowns();
+      drawPreview();
+      drawEnrichRows();
+      document.getElementById('upz').classList.add('ok');
+      document.getElementById('upz-title').textContent='\u2713 '+accs.length+' accounts loaded';
+      document.getElementById('upload-next').style.display='flex';
+      document.getElementById('prev-card').style.display='block';
+    } catch(err){ console.error(err); alert('Could not read CSV. Check format matches the template.'); }
+  };
+  reader.readAsText(file);
+}
+
+function fySum(a,fy){ return a.m36.slice(fy*12,fy*12+12).reduce(function(s,v){return s+v;},0); }
+function cagrCalc(y1,y3,yrs){ if(!y1||!y3||y1<=0||yrs<2) return null; return(Math.pow(y3/y1,1/(yrs-1))-1)*100; }
+
+// Populate all account dropdowns across the app
+function popAccDropdowns(){
+  var ids=['prev-filter','enrich-filter','tgt-filter','pri-filter-acc','acc-sel','ins-filter'];
+  ids.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el) return;
+    var prev=el.value;
+    el.innerHTML='<option value="">All accounts</option>';
+    accs.forEach(function(a,i){ el.innerHTML+='<option value="'+i+'">'+a.name+'</option>'; });
+    if(prev) el.value=prev;
+  });
+}
+
+// ═══ PREVIEW ══════════════════════════════════════════════
+function drawPreview(){
+  document.getElementById('prev-count').textContent=accs.length;
+  var fEl=document.getElementById('prev-filter');
+  var fv=fEl?fEl.value:'';
+  var toShow=fv?[accs[parseInt(fv)]].filter(Boolean):accs;
+  var html='<thead><tr><th>Account</th><th>FY24</th><th>FY25</th><th>FY26</th><th>3yr CAGR</th></tr></thead><tbody>';
+  var totF24=0,totF25=0,totF26=0;
+  accs.forEach(function(a){
+    var f24=fySum(a,0),f25=fySum(a,1),f26=fySum(a,2);
+    totF24+=f24; totF25+=f25; totF26+=f26;
+  });
+  toShow.forEach(function(a){
+    var f24=fySum(a,0),f25=fySum(a,1),f26=fySum(a,2);
+    var cg=cagrCalc(f24,f26,3);
+    var cgStr=cg!==null?(cg>=0?'+':'')+cg.toFixed(1)+'%':'—';
+    var cgCol=cg===null?'var(--mt)':cg>=10?'var(--gn)':cg>=0?'var(--am)':'var(--rd)';
+    html+='<tr><td style="font-weight:600">'+a.name+'</td>'+
+      '<td class="mono">'+fmt(f24)+'</td><td class="mono">'+fmt(f25)+'</td>'+
+      '<td class="mono">'+fmt(f26)+'</td>'+
+      '<td class="mono" style="color:'+cgCol+'">'+cgStr+'</td></tr>';
+  });
+  if(!fv){
+    // Total row
+    var totCg=cagrCalc(totF24,totF26,3);
+    var totCgStr=totCg!==null?(totCg>=0?'+':'')+totCg.toFixed(1)+'%':'—';
+    html+='<tr class="total-row"><td>Portfolio total</td>'+
+      '<td class="mono">'+fmt(totF24)+'</td><td class="mono">'+fmt(totF25)+'</td>'+
+      '<td class="mono">'+fmt(totF26)+'</td>'+
+      '<td class="mono" style="color:var(--bl)">'+totCgStr+'</td></tr>';
+  }
+  document.getElementById('prev-tbl').innerHTML=html+'</tbody>';
+}
+
+// ═══ ENRICH FORM ══════════════════════════════════════════
+function mkSel(id,val){
+  var o='<option value="0"'+(val===null?' selected':'')+'>&mdash;</option>';
+  for(var n=1;n<=5;n++) o+='<option value="'+n+'"'+(val===n?' selected':'')+'>'+n+'</option>';
+  return '<select id="'+id+'">'+o+'</select>';
+}
+function smCard(lbl,val,col){
+  return '<div class="smcard"><div class="smcard-l">'+lbl+'</div><div class="smcard-v" style="color:'+col+'">'+val+'</div></div>';
+}
+
+function drawEnrichRows(){
+  var totF24=accs.reduce(function(s,a){return s+fySum(a,0);},0);
+  var totF26=accs.reduce(function(s,a){return s+fySum(a,2);},0);
+  var portCg=cagrCalc(totF24,totF26,3);
+  var portCgStr=portCg!==null?(portCg>=0?'+':'')+portCg.toFixed(1)+'%':'—';
+  var portCol=portCg===null?'var(--mt)':portCg>=10?'var(--gn)':portCg>=0?'var(--am)':'var(--rd)';
+  var nGrow=accs.filter(function(a){var c=cagrCalc(fySum(a,0),fySum(a,2),3);return c!==null&&c>0;}).length;
+  var nDecl=accs.filter(function(a){var c=cagrCalc(fySum(a,0),fySum(a,2),3);return c!==null&&c<0;}).length;
+  document.getElementById('port-summary').innerHTML=
+    '<div style="font-size:11px;font-weight:600;color:var(--mt);align-self:center;margin-right:4px">Portfolio overview</div>'+
+    smCard('3yr CAGR',portCgStr,portCol)+
+    smCard('FY26 total',fmt(totF26),'var(--tx)')+
+    smCard('Growing',nGrow,'var(--gn)')+
+    smCard('Declining',nDecl,nDecl>0?'var(--rd)':'var(--mt)')+
+    smCard('Total accounts',accs.length,'var(--tx)');
+
+  var fEl=document.getElementById('enrich-filter');
+  var fv=fEl?fEl.value:'';
+  var toShow=fv?[{a:accs[parseInt(fv)],i:parseInt(fv)}]:accs.map(function(a,i){return{a:a,i:i};});
+  var html='';
+  toShow.forEach(function(obj){
+    var a=obj.a,i=obj.i;
+    if(!a) return;
+    var f24=fySum(a,0),f26=fySum(a,2);
+    var cg=cagrCalc(f24,f26,3);
+    var cgStr=cg!==null?(cg>=0?'+':'')+cg.toFixed(1)+'%':'—';
+    var cgCol=cg===null?'var(--mt)':cg>=10?'var(--gn)':cg>=0?'var(--am)':'var(--rd)';
+    var e=enr[i]||{rel:null,comp:null,prod:null};
+    html+='<div class="erow">'+
+      '<div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+a.name+'">'+a.name+'</div>'+
+      '<div class="mono" style="font-size:12px;color:'+cgCol+'">'+cgStr+'</div>'+
+      '<div class="mono" style="font-size:12px">'+fmt(f26)+'</div>'+
+      '<div style="display:flex;align-items:center;gap:5px">'+
+      '<span style="font-size:10px;color:var(--mt)">Rel</span>'+mkSel('r'+i,e.rel)+
+      '<span style="font-size:10px;color:var(--mt)">Comp</span>'+mkSel('c'+i,e.comp)+
+      '<span style="font-size:10px;color:var(--mt)">Prod</span>'+mkSel('p'+i,e.prod)+
+      '</div></div>';
+  });
+  document.getElementById('enrich-rows').innerHTML=html;
+}
+
+function syncEnr(){
+  accs.forEach(function(a,i){
+    enr[i]=enr[i]||{name:a.name,rel:null,comp:null,prod:null};
+    var r=document.getElementById('r'+i);
+    var c=document.getElementById('c'+i);
+    var p=document.getElementById('p'+i);
+    enr[i].rel =(r&&+r.value>0)?+r.value:null;
+    enr[i].comp=(c&&+c.value>0)?+c.value:null;
+    enr[i].prod=(p&&+p.value>0)?+p.value:null;
+  });
+}
+
+// ═══ CLASSIFICATION ══════════════════════════════════════
+function classify(cg,rel,comp,prod){
+  if(cg===null) return 'unknown';
+  var hR=rel>0,hC=comp>0,hP=prod>0;
+  if(hC&&hR&&comp>=4&&rel<=2) return 'protect';
+  if(hC&&comp>=4&&cg<5)       return 'protect';
+  if(hR&&hP&&rel>=4&&prod<=2) return 'explore';
+  if(cg>12&&(!hC||comp<=3))   return 'grow';
+  if(cg>8&&hR&&rel>=4&&(!hC||comp<=3)) return 'grow';
+  if(cg>8&&!hR&&!hC)          return 'grow';
+  if(cg<0&&hC&&comp>=3)       return 'protect';
+  if(cg<0)                    return 'hold';
+  if(hP&&prod>=4&&cg<8)       return 'hold';
+  if(cg>=5&&cg<=8)            return 'hold';
+  return 'grow';
+}
+function riskInfo(comp,rel){
+  if(!comp&&!rel) return ['—','var(--mt)'];
+  var c=comp||3,r=rel||3,s=c-r*0.5;
+  if(s>3)   return ['High risk','var(--rd)'];
+  if(s>1.5) return ['Med risk','var(--am)'];
+  return ['Low risk','var(--gn)'];
+}
+
+// ═══ BUILD COMPUTED ══════════════════════════════════════
+function buildComp(){
+  comp=accs.map(function(a,i){
+    var f24m=a.m36.slice(0,12),f25m=a.m36.slice(12,24),f26m=a.m36.slice(24,36);
+    var f24=f24m.reduce(function(s,v){return s+v;},0);
+    var f25=f25m.reduce(function(s,v){return s+v;},0);
+    var f26=f26m.reduce(function(s,v){return s+v;},0);
+    var cg=cagrCalc(f24,f26,3);
+    var sw=[];
+    for(var m=0;m<12;m++){
+      var t3=f24m[m]+f25m[m]+f26m[m];
+      var tA=f24+f25+f26;
+      sw.push(tA>0?t3/tA:1/12);
+    }
+    var wS=sw.reduce(function(s,v){return s+v;},0);
+    sw=sw.map(function(w){return w/wS;});
+    var nat=cg!==null?f26*(1+cg/100):f26;
+    var e=enr[i]||{rel:null,comp:null,prod:null};
+    var ri=riskInfo(e.comp,e.rel);
+    return{name:a.name,f24:f24,f25:f25,f26:f26,cg:cg,nat:nat,des:nat,natCg:cg,desCg:cg,
+      sw:sw,rel:e.rel,comp:e.comp,prod:e.prod,
+      cls:classify(cg,e.rel,e.comp,e.prod),rLbl:ri[0],rCol:ri[1]};
+  });
+}
+
+// ═══ TARGETS — CORRECT CAGR FORMULA ══════════════════════
+// Desired CAGR = Natural CAGR × (1 + extra%/100)
+// e.g. 20% natural, 20% extra → 20 × 1.2 = 24% desired
+// Desired FY27 = FY26 × (1 + desiredCAGR/100)
+function calcTargets(){
+  if(!comp.length) return;
+  var extra=Math.max(0,parseFloat(document.getElementById('des-pct').value)||0);
+  comp.forEach(function(a){
+    var natCg=a.cg!==null?a.cg:0;
+    var desCg=natCg*(1+extra/100); // YOUR formula: natural CAGR × (1 + extra%/100)
+    a.desCg=desCg;
+    a.des=a.f26*(1+desCg/100);
+  });
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  // Portfolio-level CAGR = cagrCalc on total FY24 → total FY26 (correct method)
+  var totFY24=comp.reduce(function(s,a){return s+a.f24;},0);
+  var totFY26=comp.reduce(function(s,a){return s+a.f26;},0);
+  var portNatCg=cagrCalc(totFY24,totFY26,3)||0;
+  var portDesCg=portNatCg*(1+extra/100);
+  var nEl=document.getElementById('nat-total');
+  var dEl=document.getElementById('des-total');
+  var nCL=document.getElementById('nat-cagr-lbl');
+  var dCL=document.getElementById('des-cagr-lbl');
+  if(nEl) nEl.innerHTML=fmt(totNat);
+  if(dEl) dEl.innerHTML=fmt(totDes);
+  if(nCL) nCL.textContent='Portfolio 3yr CAGR: '+(portNatCg>=0?'+':'')+portNatCg.toFixed(1)+'%';
+  if(dCL) dCL.textContent='Effective desired CAGR: '+(portDesCg>=0?'+':'')+portDesCg.toFixed(1)+'%';
+}
+
+function onDesPctChange(){
+  if(!comp.length) return;
+  calcTargets();
+  drawTgtTable();
+  drawPriorities();
+  drawMonthly();
+  drawSim();
+  drawInsights();
+}
+
+function drawTgtTable(){
+  var fEl=document.getElementById('tgt-filter');
+  var fv=fEl?fEl.value:'';
+  var toShow=fv?[{a:comp[parseInt(fv)],i:parseInt(fv)}]:comp.map(function(a,i){return{a:a,i:i};});
+  var html='';
+  var totF26=0,totNat=0,totDes=0;
+  comp.forEach(function(a){totF26+=a.f26;totNat+=a.nat;totDes+=a.des;});
+  toShow.forEach(function(obj){
+    var a=obj.a,i=obj.i;
+    if(!a) return;
+    var natCgStr=a.cg!==null?(a.cg>=0?'+':'')+a.cg.toFixed(1)+'%':'—';
+    var natCgCol=a.cg===null?'var(--mt)':a.cg>=10?'var(--gn)':a.cg>=0?'var(--am)':'var(--rd)';
+    var desCgStr=a.desCg!==undefined?(a.desCg>=0?'+':'')+a.desCg.toFixed(1)+'%':'—';
+    var gap=a.des-a.nat;
+    var dispDes=dispUnit==='N'?Math.round(a.des*100000):dispUnit==='Cr'?(Math.round(a.des/100*10000)/10000):dispUnit==='K'?Math.round(a.des*10):Math.round(a.des*10)/10;
+    html+='<tr>'+
+      '<td style="font-weight:600">'+a.name+'</td>'+
+      '<td class="mono">'+fmt(a.f26)+'</td>'+
+      '<td class="mono" style="color:'+natCgCol+'">'+natCgStr+'</td>'+
+      '<td class="mono" style="color:var(--gn)">'+fmt(a.nat)+'</td>'+
+      '<td class="mono" style="color:var(--am)">'+desCgStr+'</td>'+
+      '<td><input type="number" value="'+dispDes+'" onchange="overrideDes('+i+',this.value)" style="color:var(--am)"></td>'+
+      '<td class="mono" style="color:'+(gap>=0?'var(--rd)':'var(--gn)')+'">'+(gap>=0?'+':'')+fmt(gap)+'</td>'+
+      '</tr>';
+  });
+  if(!fv){
+    var totNatCg=cagrCalc(comp.reduce(function(s,a){return s+a.f26;},0)/(comp.length||1)*comp.length,totNat,1); // rough
+    html+='<tr class="total-row">'+
+      '<td>Portfolio total</td>'+
+      '<td class="mono">'+fmt(totF26)+'</td>'+
+      '<td></td>'+
+      '<td class="mono" style="color:var(--gn)">'+fmt(totNat)+'</td>'+
+      '<td></td>'+
+      '<td class="mono" style="color:var(--am)">'+fmt(totDes)+'</td>'+
+      '<td class="mono" style="color:var(--rd)">+'+fmt(totDes-totNat)+'</td>'+
+      '</tr>';
+  }
+  document.getElementById('tgt-body').innerHTML=html;
+}
+
+function overrideDes(i,val){
+  if(!comp[i]) return;
+  comp[i].des=toL(parseFloat(val)||0);
+  comp[i].desCg=comp[i].f26>0?((comp[i].des/comp[i].f26)-1)*100:0;
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  var nEl=document.getElementById('nat-total');
+  var dEl=document.getElementById('des-total');
+  if(nEl) nEl.innerHTML=fmt(totNat);
+  if(dEl) dEl.innerHTML=fmt(totDes);
+  drawTgtTable();
+}
+
+// ═══ RUN ANALYSIS ════════════════════════════════════════
+function runAnalysis(){
+  var rows=document.querySelectorAll('#tgt-body tr:not(.total-row)');
+  rows.forEach(function(row,i){
+    var inp=row.querySelector('input[type=number]');
+    if(inp&&comp[i]){
+      comp[i].des=toL(parseFloat(inp.value)||comp[i].des);
+      comp[i].desCg=comp[i].f26>0?((comp[i].des/comp[i].f26)-1)*100:0;
+    }
+  });
+  popAccDropdowns();
+  drawPriorities();
+  drawMonthly();
+  drawSim();
+  drawInsights();
+  goTo('priority');
+}
+
+// ═══ PRIORITIES ══════════════════════════════════════════
+function kpi(lbl,val,sub,col){
+  return '<div class="metric"><div class="ml">'+lbl+'</div><div class="mv"'+(col?' style="color:'+col+'"':'')+'>'+val+'</div>'+(sub?'<div class="ms">'+sub+'</div>':'')+'</div>';
+}
+function bar(lbl,w,col,valStr){
+  return '<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">'+
+    '<div style="width:65px;font-size:10px;color:var(--mt);font-weight:500;flex-shrink:0">'+lbl+'</div>'+
+    '<div style="flex:1;height:10px;background:var(--sf2);border-radius:5px;overflow:hidden;border:1px solid var(--bd)">'+
+    '<div style="width:'+w+'%;height:100%;background:'+col+';border-radius:5px;transition:width .5s"></div></div>'+
+    '<div style="width:62px;font-size:10px;font-family:\'JetBrains Mono\',monospace;font-weight:600;color:'+col+';text-align:right;flex-shrink:0">'+valStr+'</div></div>';
+}
+
+function drawPriorities(){
+  if(!comp.length) return;
+  var totF26=comp.reduce(function(s,a){return s+a.f26;},0);
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  var gap=totDes-totNat;
+  var atRisk=comp.filter(function(a){return a.comp&&a.comp>=4&&a.rel&&a.rel<=2;});
+  document.getElementById('pri-kpis').innerHTML=
+    kpi('FY26 actual',fmt(totF26),comp.length+' accounts')+
+    kpi('Natural FY27',fmt(totNat),'CAGR momentum','var(--gn)')+
+    kpi('Desired FY27',fmt(totDes),'adjusted CAGR','var(--am)')+
+    kpi('Gap to close',fmt(gap),'above natural','var(--rd)');
+  document.getElementById('pri-warns').innerHTML=atRisk.map(function(a){
+    return '<div class="danger"><strong>'+a.name+'</strong> — competitor risk '+a.comp+'/5 + relationship '+a.rel+'/5. Needs immediate attention.</div>';
+  }).join('');
+
+  var fAcc=document.getElementById('pri-filter-acc');
+  var fCls=document.getElementById('pri-filter-cls');
+  var fAccV=fAcc?fAcc.value:'';
+  var fClsV=fCls?fCls.value:'';
+  var ord={grow:0,explore:1,hold:2,protect:3,unknown:4};
+  var filtered=comp.slice().filter(function(a,i){
+    if(fAccV&&i!==parseInt(fAccV)) return false;
+    if(fClsV&&a.cls!==fClsV) return false;
+    return true;
+  });
+  var sorted=filtered.sort(function(a,b){return(ord[a.cls]||4)-(ord[b.cls]||4);});
+  var lh=sorted.length===0?'<div style="font-size:13px;color:var(--mt);padding:8px 0">No accounts match this filter.</div>':'';
+  sorted.forEach(function(a,i){
+    var s=STRAT[a.cls]||STRAT.unknown;
+    var natCgStr=a.cg!==null?(a.cg>=0?'+':'')+a.cg.toFixed(1)+'%':'—';
+    var desCgStr=a.desCg!==undefined?(a.desCg>=0?'+':'')+a.desCg.toFixed(1)+'%':'—';
+    var last=i===sorted.length-1;
+    lh+='<div style="padding:10px 0;border-bottom:'+(last?'none':'1px solid var(--bd)')+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+      '<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">'+
+      '<span style="font-weight:700">'+a.name+'</span>'+
+      '<span class="badge '+s.bc+'">'+s.lbl+'</span>'+
+      '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(0,0,0,.06);color:'+a.rCol+';font-weight:600">'+a.rLbl+'</span>'+
+      '</div>'+
+      '<div style="text-align:right;flex-shrink:0;margin-left:10px">'+
+      '<div style="font-size:10px;color:var(--mt)">Natural <span class="mono" style="color:var(--gn)">'+fmt(a.nat)+'</span> @ <span style="color:var(--gn)">'+natCgStr+'</span></div>'+
+      '<div style="font-size:10px;color:var(--mt)">Desired <span class="mono" style="color:var(--am)">'+fmt(a.des)+'</span> @ <span style="color:var(--am)">'+desCgStr+'</span></div>'+
+      '</div></div>'+
+      '<div style="font-size:10px;color:var(--mt)">FY26: '+fmt(a.f26)+' &nbsp;·&nbsp; Rel '+(a.rel||'—')+'/5 &nbsp;·&nbsp; Comp '+(a.comp||'—')+'/5 &nbsp;·&nbsp; Prod '+(a.prod||'—')+'/5</div>'+
+      '</div>';
+  });
+  document.getElementById('pri-list').innerHTML=lh;
+
+  var cc={grow:'#059669',protect:'#dc2626',hold:'#d97706',explore:'#2563eb',unknown:'#6b7194'};
+  var maxV=Math.max.apply(null,comp.map(function(a){return Math.max(a.nat,a.des);}).concat([1]));
+  document.getElementById('pri-bars').innerHTML=comp.map(function(a){
+    var nW=Math.max(2,Math.round(a.nat/maxV*100));
+    var dW=Math.max(2,Math.round(a.des/maxV*100));
+    var ac=cc[a.cls]||'#6b7194';
+    return '<div style="margin-bottom:10px">'+
+      '<div style="font-size:11px;font-weight:600;margin-bottom:4px">'+a.name+'</div>'+
+      bar('Natural',nW,'#059669',fmt(a.nat))+bar('Desired',dW,ac,fmt(a.des))+
+      '</div>';
+  }).join('')+
+  '<div style="font-size:10px;color:var(--mt);margin-top:6px;display:flex;gap:14px;padding-top:8px;border-top:1px solid var(--bd)">'+
+  '<span><span style="display:inline-block;width:14px;height:4px;background:#059669;border-radius:2px;vertical-align:middle;margin-right:3px"></span>Natural CAGR</span>'+
+  '<span><span style="display:inline-block;width:14px;height:4px;background:var(--bl);border-radius:2px;vertical-align:middle;margin-right:3px"></span>Desired (colour = strategy)</span></div>';
+}
+
+// ═══ MONTHLY ══════════════════════════════════════════════
+function aggSW(){
+  var a=[0,0,0,0,0,0,0,0,0,0,0,0];
+  comp.forEach(function(c){ c.sw.forEach(function(w,m){ a[m]+=w; }); });
+  var s=a.reduce(function(t,v){return t+v;},0);
+  return a.map(function(w){return w/s;});
+}
+function makeMGrid(elId,targets,adjTargets,curM,hasAch,col){
+  var html='';
+  for(var m=0;m<12;m++){
+    var isPast=m<curM-1,isCur=m===curM-1;
+    var t=(hasAch&&!isPast&&adjTargets)?adjTargets[m-(curM-1)]:targets[m];
+    var cls=(isPast?'past ':isCur?'cur ':'')+(QCLS[FYQ[m]]||'');
+    var tc=isPast?'var(--mt)':isCur?'var(--bl)':col;
+    html+='<div class="mc '+cls+'"><div class="mn">'+FYM[m]+'</div><div class="mv2" style="color:'+tc+'">'+fmtS(t)+'</div><div class="mq">Q'+(FYQ[m]+1)+'</div></div>';
+  }
+  document.getElementById(elId).innerHTML=html;
+}
+function drawMonthly(){
+  if(!comp.length) return;
+  var curM=Math.min(Math.max(parseInt(document.getElementById('cur-m').value)||1,1),12);
+  var achRaw=parseFloat(document.getElementById('fy-ach').value)||0;
+  var ach=toL(achRaw);
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  var sw=aggSW();
+  var mNat=sw.map(function(w){return w*totNat;});
+  var mDes=sw.map(function(w){return w*totDes;});
+  var futSW=sw.slice(curM-1);
+  var futSum=futSW.reduce(function(s,v){return s+v;},0);
+  var hasAch=ach>0;
+  var adjNat=futSW.map(function(w){return futSum>0?(w/futSum)*(totNat-ach):0;});
+  var adjDes=futSW.map(function(w){return futSum>0?(w/futSum)*(totDes-ach):0;});
+  makeMGrid('mg-nat',mNat,adjNat,curM,hasAch,'var(--gn)');
+  makeMGrid('mg-des',mDes,adjDes,curM,hasAch,'var(--am)');
+  var sel=document.getElementById('acc-sel');
+  var prev=sel.value;
+  sel.innerHTML='<option value="">— Select an account —</option>';
+  comp.forEach(function(a,i){ sel.innerHTML+='<option value="'+i+'">'+a.name+'</option>'; });
+  if(prev) sel.value=prev;
+  drawAccMonthly();
+  var ytdDes=mDes.slice(0,curM-1).reduce(function(s,v){return s+v;},0);
+  var shortfall=ytdDes-ach;
+  var rmM=12-curM+1;
+  var items=[];
+  if(hasAch&&shortfall>0.01){
+    items.push(['YTD shortfall',fmt(shortfall)+' behind desired plan']);
+    items.push(['Months remaining',rmM+' months ('+FYM[curM-1]+' – Mar 27)']);
+    items.push(['Extra per month',fmt(shortfall/rmM)+' above normal target']);
+    var pa=comp.filter(function(a){return a.cls==='grow'||a.cls==='explore';});
+    if(pa.length) items.push(['Recovery via',pa.map(function(a){return a.name;}).join(', ')]);
+  } else if(hasAch){
+    items.push(['YTD position',fmt(Math.abs(shortfall))+' ahead of desired plan']);
+    items.push(['Remaining target',fmt(totDes-ach)+' over '+rmM+' months']);
+  } else {
+    items.push(['Note','Enter FY27 YTD revenue above to generate a recovery plan.']);
+  }
+  document.getElementById('recovery').innerHTML=items.map(function(it){
+    return '<div class="rr"><span style="color:var(--mt);font-weight:500">'+it[0]+'</span><span>'+it[1]+'</span></div>';
+  }).join('');
+}
+function drawAccMonthly(){
+  var idx=document.getElementById('acc-sel').value;
+  var el=document.getElementById('mg-acc');
+  if(!idx){ el.innerHTML='<div style="font-size:12px;color:var(--mt);padding:6px 0">Select an account above.</div>'; return; }
+  var a=comp[parseInt(idx)];
+  if(!a){ el.innerHTML=''; return; }
+  var curM=Math.min(Math.max(parseInt(document.getElementById('cur-m').value)||1,1),12);
+  var achRaw=parseFloat(document.getElementById('fy-ach').value)||0;
+  var ach=toL(achRaw);
+  var hasAch=ach>0;
+  var totNat=comp.reduce(function(s,c){return s+c.nat;},0);
+  var totDes=comp.reduce(function(s,c){return s+c.des;},0);
+  var accAchN=totNat>0?ach*(a.nat/totNat):0;
+  var accAchD=totDes>0?ach*(a.des/totDes):0;
+  var natM=a.sw.map(function(w){return w*a.nat;});
+  var desM=a.sw.map(function(w){return w*a.des;});
+  var fSW=a.sw.slice(curM-1);
+  var fSum=fSW.reduce(function(s,v){return s+v;},0);
+  var adjN=fSW.map(function(w){return fSum>0?(w/fSum)*(a.nat-accAchN):0;});
+  var adjD=fSW.map(function(w){return fSum>0?(w/fSum)*(a.des-accAchD):0;});
+  function makeAcc(targets,adjT,col,lbl){
+    var h='<div style="font-size:11px;font-weight:600;color:var(--mt);margin-bottom:5px">'+a.name+' — '+lbl+'</div><div class="mgrid" style="margin-bottom:10px">';
+    for(var m=0;m<12;m++){
+      var isPast=m<curM-1,isCur=m===curM-1;
+      var t=(hasAch&&!isPast&&adjT)?adjT[m-(curM-1)]:targets[m];
+      var cls=(isPast?'past ':isCur?'cur ':'')+(QCLS[FYQ[m]]||'');
+      h+='<div class="mc '+cls+'"><div class="mn">'+FYM[m]+'</div><div class="mv2" style="font-size:11px;color:'+(isPast?'var(--mt)':col)+'">'+fmtS(t)+'</div><div class="mq">Q'+(FYQ[m]+1)+'</div></div>';
+    }
+    return h+'</div>';
+  }
+  el.innerHTML=makeAcc(natM,adjN,'var(--gn)','Natural FY27')+makeAcc(desM,adjD,'var(--am)','Desired FY27');
+}
+
+// ═══ SIMULATOR — shows % above FY26 clearly ═══════════════
+function drawSim(){
+  if(!comp.length) return;
+  var defMap={grow:20,explore:18,hold:5,protect:0,unknown:5};
+  document.getElementById('sim-ctrls').innerHTML=comp.map(function(a,i){
+    var def=defMap[a.cls]!==undefined?defMap[a.cls]:5;
+    var s=STRAT[a.cls]||STRAT.unknown;
+    var natCgStr=a.cg!==null?(a.cg>=0?'+':'')+a.cg.toFixed(1)+'%':'—';
+    var desCgStr=a.desCg!==undefined?(a.desCg>=0?'+':'')+a.desCg.toFixed(1)+'%':'—';
+    return '<div class="simrow">'+
+      '<div class="slbl">'+
+        '<div style="font-size:12px;font-weight:600">'+a.name+' <span class="badge '+s.bc+'" style="font-size:9px">'+s.lbl+'</span></div>'+
+        '<div style="font-size:10px;color:var(--mt);margin-top:1px">Natural CAGR: '+natCgStr+' &nbsp;|&nbsp; Desired CAGR: '+desCgStr+'</div>'+
+      '</div>'+
+      '<input type="range" min="-30" max="60" step="1" value="'+def+'" id="sl'+i+'" oninput="updSim()">'+
+      '<div class="spct" id="sv'+i+'">'+(def>=0?'+':'')+def+'%</div></div>';
+  }).join('');
+  updSim();
+}
+
+function updSim(){
+  if(!comp.length) return;
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  var totF26=comp.reduce(function(s,a){return s+a.f26;},0);
+  var sim=0,warns=[];
+  comp.forEach(function(a,i){
+    var sl=document.getElementById('sl'+i);
+    var vl=document.getElementById('sv'+i);
+    if(!sl||!vl) return;
+    var pct=parseInt(sl.value);
+    // pct is % growth above FY26
+    var simVal=a.f26*(1+pct/100);
+    vl.textContent=(pct>=0?'+':'')+pct+'% on FY26';
+    vl.style.color=pct>0?'var(--gn)':pct<0?'var(--rd)':'var(--mt)';
+    sim+=simVal;
+    // Warn if slider is below natural CAGR for this account
+    if(a.cg!==null&&pct<a.cg-1) warns.push('<strong>'+a.name+'</strong>: slider at +'+pct+'% but natural CAGR is '+a.cg.toFixed(1)+'%. You are projecting below trend.');
+    if(a.comp&&a.comp>=4&&pct>15) warns.push('<strong>'+a.name+'</strong>: pushing +'+pct+'% above FY26 but competitor risk is '+a.comp+'/5.');
+    if(a.prod&&a.prod<=2&&a.rel&&a.rel>=4&&pct<5) warns.push('<strong>'+a.name+'</strong>: strong relationship ('+a.rel+'/5) + low product use ('+a.prod+'/5). Cross-sell opportunity being ignored.');
+  });
+  var gPct=totF26>0?((sim-totF26)/totF26*100):0;
+  document.getElementById('sim-kpis').innerHTML=
+    kpi('Simulated FY27',fmt(sim))+
+    kpi('vs Natural CAGR',(sim>=totNat?'+':'-')+fmt(Math.abs(sim-totNat)),null,sim>=totNat?'var(--gn)':'var(--rd)')+
+    kpi('vs Desired',(sim>=totDes?'Hit':fmt(totDes-sim)+' short'),null,sim>=totDes?'var(--gn)':'var(--am)')+
+    kpi('Growth on FY26',gPct.toFixed(1)+'%');
+  var maxV=Math.max(sim,totNat,totDes,totF26,1);
+  document.getElementById('sim-bars').innerHTML=[
+    {l:'FY26 actual',v:totF26,c:'#e2e5f0'},
+    {l:'Simulated',v:sim,c:'#2563eb'},
+    {l:'Natural CAGR',v:totNat,c:'#059669'},
+    {l:'Desired',v:totDes,c:'#d97706'}
+  ].map(function(r){
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'+
+      '<div style="width:90px;font-size:11px;color:var(--mt);font-weight:500;flex-shrink:0">'+r.l+'</div>'+
+      '<div style="flex:1;height:8px;background:var(--sf2);border-radius:4px;overflow:hidden;border:1px solid var(--bd)">'+
+      '<div style="width:'+Math.round(r.v/maxV*100)+'%;height:100%;background:'+r.c+';border-radius:4px;transition:width .5s"></div></div>'+
+      '<div style="width:62px;font-size:11px;font-family:\'JetBrains Mono\',monospace;font-weight:500;text-align:right;flex-shrink:0">'+fmt(r.v)+'</div></div>';
+  }).join('');
+  document.getElementById('sim-warns').innerHTML=warns.map(function(w){return '<div class="warn">'+w+'</div>';}).join('');
+}
+
+// ═══ INSIGHTS — TABLE FORMAT + CORRECT CAGR FORMULA ══════
+function drawInsights(){
+  if(!comp.length) return;
+  var totF26=comp.reduce(function(s,a){return s+a.f26;},0);
+  var totF25=comp.reduce(function(s,a){return s+a.f25;},0);
+  var totF24=comp.reduce(function(s,a){return s+a.f24;},0);
+  var totNat=comp.reduce(function(s,a){return s+a.nat;},0);
+  var totDes=comp.reduce(function(s,a){return s+a.des;},0);
+  var gap=totDes-totNat;
+  var natG=totF26>0?((totNat-totF26)/totF26*100):0;
+  var desG=totF26>0?((totDes-totF26)/totF26*100):0;
+  var g2526=totF25>0?((totF26-totF25)/totF25*100):0;
+  var g2425=totF24>0?((totF25-totF24)/totF24*100):0;
+  var mDir=g2526>g2425?'Accelerating':'Decelerating';
+  var byRev=comp.slice().sort(function(a,b){return b.f26-a.f26;});
+  var top1=byRev[0]||{name:'',f26:0};
+  var top1p=totF26>0?(top1.f26/totF26*100):0;
+  var declining=comp.filter(function(a){return a.cg!==null&&a.cg<0;});
+  var pushAccs=comp.filter(function(a){return a.cls==='grow'||a.cls==='explore';});
+  var pushUplift=pushAccs.reduce(function(s,a){return s+(a.des-a.nat);},0);
+  var natBeaters=comp.filter(function(a){return a.nat>a.des*1.02;});
+
+  // Build signals as table rows
+  var sigRows=[];
+  sigRows.push({
+    icon:mDir==='Accelerating'?'&#8593;':'&#8595;',
+    col:mDir==='Accelerating'?'#059669':'#d97706',
+    signal:'Portfolio momentum',
+    detail:mDir+': FY24&#8594;FY25 '+g2425.toFixed(1)+'%, FY25&#8594;FY26 '+g2526.toFixed(1)+'%',
+    impact:mDir==='Accelerating'?'Supports FY27 ambition':'Desired target ('+desG.toFixed(1)+'%) requires reversing slowdown'
+  });
+  if(top1p>40) sigRows.push({icon:'!',col:'#dc2626',signal:'Concentration risk',
+    detail:top1.name+' = '+top1p.toFixed(0)+'% of portfolio',
+    impact:'10% slowdown here = ~'+( top1p*0.1).toFixed(1)+'pp drop in total growth'});
+  if(declining.length>0) sigRows.push({icon:'&#8595;',col:'#dc2626',signal:'Declining accounts ('+declining.length+')',
+    detail:declining.map(function(a){return a.name+' ('+a.cg.toFixed(1)+'%)';}).join(', '),
+    impact:'Natural FY27 from these accounts is below FY26 revenue'});
+  if(gap>0&&pushUplift<gap*0.6) sigRows.push({icon:'!',col:'#dc2626',signal:'Gap feasibility',
+    detail:'Push+Explore accounts can deliver only ~'+fmt(pushUplift),
+    impact:fmt(gap)+' gap may not be achievable. Consider lowering desired %'});
+  else if(gap>0&&pushUplift>=gap*0.6) sigRows.push({icon:'&#10003;',col:'#059669',signal:'Gap feasibility',
+    detail:'Push+Explore accounts can deliver ~'+fmt(pushUplift),
+    impact:fmt(gap)+' gap is achievable if '+pushAccs.map(function(a){return a.name;}).join(', ')+' perform to plan'});
+  if(natBeaters.length>0) sigRows.push({icon:'&#8593;',col:'#059669',signal:'Underestimated targets',
+    detail:natBeaters.map(function(a){return a.name;}).join(', ')+' natural CAGR already exceeds desired',
+    impact:'Consider raising desired targets for these accounts'});
+
+  document.getElementById('exec-box').innerHTML=
+    '<div class="et">Portfolio data signals — FY27 outlook</div>'+
+    '<div class="eg">'+
+    '<div class="em"><div class="eml">FY26&#8594;FY27 natural growth</div><div class="emv" style="color:#6ee7b7">'+natG.toFixed(1)+'%</div></div>'+
+    '<div class="em"><div class="eml">FY26&#8594;FY27 desired growth</div><div class="emv" style="color:#fde68a">'+desG.toFixed(1)+'%</div></div>'+
+    '<div class="em"><div class="eml">Extra effort needed</div><div class="emv" style="color:#fca5a5">'+fmt(gap)+'</div></div>'+
+    '</div>'+
+    '<table class="sig-table"><thead><tr><th></th><th>Signal</th><th>What the data shows</th><th>Impact</th></tr></thead><tbody>'+
+    sigRows.map(function(r){
+      return '<tr>'+
+        '<td><div class="sicon" style="background:'+r.col+'20;color:'+r.col+'">'+r.icon+'</div></td>'+
+        '<td style="font-weight:600;white-space:nowrap">'+r.signal+'</td>'+
+        '<td>'+r.detail+'</td>'+
+        '<td style="color:rgba(255,255,255,.7)">'+r.impact+'</td>'+
+        '</tr>';
+    }).join('')+
+    '</tbody></table>';
+
+  // Account filter
+  var iF=document.getElementById('ins-filter');
+  if(iF){
+    var prev=iF.value;
+    iF.innerHTML='<option value="">All accounts</option>';
+    comp.forEach(function(a,i){ iF.innerHTML+='<option value="'+i+'">'+a.name+'</option>'; });
+    if(prev) iF.value=prev;
+  }
+  var iFv=iF?iF.value:'';
+  var ord={grow:0,explore:1,protect:2,hold:3,unknown:4};
+  var sorted=comp.slice().sort(function(a,b){return(ord[a.cls]||4)-(ord[b.cls]||4);});
+  if(iFv) sorted=[comp[parseInt(iFv)]].filter(Boolean);
+
+  document.getElementById('acc-ins').innerHTML=sorted.map(function(a){
+    var s=STRAT[a.cls]||STRAT.unknown;
+    var natCgStr=a.cg!==null?(a.cg>=0?'+':'')+a.cg.toFixed(1)+'%':'—';
+    var desCgStr=a.desCg!==undefined?(a.desCg>=0?'+':'')+a.desCg.toFixed(1)+'%':'—';
+    // Per-account signals as compact rows
+    var yr12=a.f24>0?((a.f25-a.f24)/a.f24*100):null;
+    var yr23=a.f25>0?((a.f26-a.f25)/a.f25*100):null;
+    var trendStr='—';
+    if(yr12!==null&&yr23!==null){
+      if(yr23<yr12-5) trendStr='<span style="color:var(--rd)">Decelerating</span> (was +'+yr12.toFixed(1)+'%, now +'+yr23.toFixed(1)+'%)';
+      else if(yr23>yr12+5) trendStr='<span style="color:var(--gn)">Accelerating</span> (was +'+yr12.toFixed(1)+'%, now +'+yr23.toFixed(1)+'%)';
+      else trendStr='Steady (+'+yr23.toFixed(1)+'%)';
+    }
+    var share=totF26>0?(a.f26/totF26*100):0;
+    var accGap=a.des-a.nat;
+    var qT=[0,0,0,0];
+    a.sw.forEach(function(w,m){qT[FYQ[m]]+=w;});
+    var maxQ=qT.indexOf(Math.max.apply(null,qT));
+    var qN=['Q1 Apr-Jun','Q2 Jul-Sep','Q3 Oct-Dec','Q4 Jan-Mar'];
+
+    return '<div class="ins '+s.lc+'">'+
+      '<div class="ins-hdr">'+
+      '<span style="font-weight:700;font-size:13px">'+a.name+'</span>'+
+      '<span class="badge '+s.bc+'">'+s.lbl+'</span>'+
+      '<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(0,0,0,.05);color:'+a.rCol+';font-weight:600;margin-left:auto">'+a.rLbl+'</span>'+
+      '</div>'+
+      '<table style="width:100%;font-size:11px;border-collapse:collapse">'+
+      '<tr><td style="color:var(--mt);font-weight:600;width:130px;padding:3px 0">Growth trend</td><td>'+trendStr+'</td></tr>'+
+      '<tr><td style="color:var(--mt);font-weight:600;padding:3px 0">Portfolio share</td><td>'+share.toFixed(1)+'% of FY26 total ('+fmt(a.f26)+')</td></tr>'+
+      '<tr><td style="color:var(--mt);font-weight:600;padding:3px 0">Natural CAGR</td><td><span style="color:var(--gn);font-weight:600">'+natCgStr+'</span> → FY27: <span style="color:var(--gn);font-family:\'JetBrains Mono\',monospace;font-weight:600">'+fmt(a.nat)+'</span></td></tr>'+
+      '<tr><td style="color:var(--mt);font-weight:600;padding:3px 0">Desired CAGR</td><td><span style="color:var(--am);font-weight:600">'+desCgStr+'</span> → FY27: <span style="color:var(--am);font-family:\'JetBrains Mono\',monospace;font-weight:600">'+fmt(a.des)+'</span></td></tr>'+
+      '<tr><td style="color:var(--mt);font-weight:600;padding:3px 0">Gap to close</td><td><span style="color:'+(accGap>0?'var(--rd)':'var(--gn)')+';font-weight:600">'+fmt(accGap)+'</span>'+(accGap>a.f26*0.05?' — requires active effort above trend':'')+'</td></tr>'+
+      '<tr><td style="color:var(--mt);font-weight:600;padding:3px 0">Peak quarter</td><td>'+qN[maxQ]+' ('+Math.round(qT[maxQ]*100)+'% of annual revenue)</td></tr>'+
+      '</table></div>';
+  }).join('');
+}
+</script>
+</body>
+</html>
